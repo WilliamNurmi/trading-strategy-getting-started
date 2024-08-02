@@ -65,10 +65,15 @@ You can find these example strategy backtests.
 
 Individual backtests:
 
+- [BTC: moving average (MA) strategy](./notebooks/single-backtest/bitcoin-ma.ipynb)
+  - Easy complexity
+  - One of the simplest technical indicator-based trading strategies there is
+  - We buy if the Bitcoin daily close price is above its simple moving average (MA), otherwise sell
+
 - [ETH: fast exponential moving average and slow exponential moving average example strategy](./notebooks/single-backtest/moving-average.ipynb)
   - Easy complexity
   - 1h timeframe  
-  - One of the simplest technical indicator-based trading strategues there is
+  - One of the simplest technical indicator-based trading strategies there is
 - [MATIC: An RSI and Bollinger bands breakout strategy for MATIC using Binance CEX data](./notebooks/single-backtest/matic-breakout.ipynb)
   - Easy complexity
   - 1h timeframe  
@@ -91,14 +96,19 @@ Individual backtests:
   - Takes a list of ERC-20 addresses as input, and creates a trading universe based on these
   - Constructs a spot market portfolio with daily rebalances
   - Average complexity
+- [Open-ended momentum basket](./notebooks/single-backtest/momentum-basket.ipynb)
+  - A portfolio construction strategy example
+  - Trades any token on Uniswap v3 on Ethereum
+  - The trading universe is open-ended: trades any token that has been ever listed on Uniswap v3
+  - High complexity  
 - [Alternative data](./notebooks/single-backtest/alternative-data.ipynb)
-  - Reads custom signal data (sentiment data) from CSV file and incorporates it as the part of the trading strategy
+  - Reads custom signal data (sentiment data) from CSV file and incorporates it as part of the trading strategy
   - Otherwise same as above
   - Average complexity
 - [Liquidity risk analysis](./notebooks/single-backtest/liquidity-risk.ipynb)
   - Same as above
   - Includes liquidity risk analysis in the strategy by trading only pairs with minimum liquidity
-  - Expands dataset to include all Polygon pairs and their liquidity data
+  - Expands the dataset to include all Polygon pairs and their liquidity data
   - Needs a separate script to prepare the dataset for the backtests
   - High complexity  
 - [Volume-based indicators](./notebooks/single-backtest/eth-mfi.ipynb)
@@ -107,7 +117,7 @@ Individual backtests:
   - Uses ETH daily price from Uniswap v3 on Ethereum
   - Low complexity
 
-# Example grid searches
+# Example grid and optimisation searches 
 
 Grid searches run several backtests over multiple strategy parameter combinations.
 This allows you to "brute force search" better strategies and explore the behavior of a strategy with different parameters.
@@ -116,6 +126,16 @@ This allows you to "brute force search" better strategies and explore the behavi
   - Same as `Multipair 1h: An ATR-based multipair breakout strategy using Binance CEX data` above
   - We have converted `Parameters` to individual parameter values to searchable option lists 
   - Grid search over parameters and see if it improves the performance
+
+- [Bollinger Bands BTC 1h: Gaussian Process optimiser](./notebooks/grid-search/btc-bb-1h-binance-optimiser.ipynb)
+  - This notebook users Gaussian Process (GP) instead of grid search to find the best strategy parameters
+  - Gaussian Process is much faster than brute forcing exhaustive grid search
+  - This is using `scikit-optimise` library
+  - Setting up optimiser is somewhat more complicate than setting up a grid search
+
+- [Multipair ATR breakout: custom optimisation target](./notebooks/grid-search/multipair-breakout-4h-optimiser-balanced.ipynb)
+  - This notebook is using an optimiser with a custom optimisation search function
+  - We weight 75% on Sharpe, 25% on Maximum Drawdow
 
 # Example research only notebooks
 
@@ -131,6 +151,11 @@ This allows you to "brute force search" better strategies and explore the behavi
   - Demostrates how to integrate `scikit-optimizer` pipeline into the notebooks
   - Uses Gaussian Process (GP) instead of a grid search, being much faster, demostrating the benefits of an optimizer  
   - Advanced complexity  
+
+# Example live trading
+
+- [Live trade executor](https://github.com/tradingstrategy-ai/dex-live-algorithmic-trading-example) example repo
+  - Set up a Docker instance that runs a strategy for live trading
 
 # How to run on Github Codespaces
 
@@ -184,6 +209,25 @@ You can find them by scrolling down to the different sections
 
 And now you are done with our first backtest! Continue below to learn more how you can get started with your own strategies.
 
+# Setting up Python environment from command line
+
+Example how to run notebooks and scripts from the command line.
+
+```shell
+# Get all Python source code we need
+# (A lot of code)
+git clone --recursive https://github.com/tradingstrategy-ai/trade-executor.git deps/trade-executor
+
+# Create virtual environment
+poetry install
+
+# Active Pytohn virtual environment
+poetry shell
+
+# Run script
+python scripts/prefilter-uniswap-v3-ethereum.py
+```
+
 # Strategy backtest notebook structure
 
 Each strategy backtest notebook will consist of following phases. 
@@ -207,15 +251,6 @@ Each strategy backtest notebook will consist of following phases.
 
 This is a rough skeleton. You mix and match can easily add your own trading signals and output charts using with all tools available in Pandas and Jupyter notebook ecosystem.
 There aren't any limitations on what you can do.
-
-# Grid search skeleton
-
-The grid search is the same invididual backtest with very minimal changes
-- **Parameters** class has single parameter values replaced with Python lists to explore all the list combinations in the grid search
-- **Backtest** runs `perform_grid_search` instead of `run_backtest_inline`
-- **Output** shows summaries backtest results and heatmaps
-
-Grid search are computer resource constrained (number of CPU cores), so we recommend running grid searches only on local powerful computers.
 
 # Learning resources
 
